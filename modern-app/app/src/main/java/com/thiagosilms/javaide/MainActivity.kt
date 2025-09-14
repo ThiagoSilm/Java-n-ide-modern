@@ -1,98 +1,192 @@
-package com.thiagosilms.javaide
+package com.thiagosilms.javaidepackage com.thiagosilms.javaide
 
-import android.os.Bundle
-import android.view.Menu
-import android.view.MenuItem
-import androidx.appcompat.app.AppCompatActivity
-import androidx.lifecycle.lifecycleScope
-import com.google.android.material.snackbar.Snackbar
-import com.thiagosilms.javaide.compiler.CloudCompiler
-import com.thiagosilms.javaide.editor.SmartEditorCache
-import com.thiagosilms.javaide.plugin.PluginManager
-import io.github.rosemoe.sora.widget.CodeEditor
+
+
+import android.os.Bundleimport android.os.Bundle
+
+import android.view.Menuimport android.view.Menu
+
+import android.view.MenuItemimport android.view.MenuItem
+
+import androidx.appcompat.app.AppCompatActivityimport androidx.appcompat.app.AppCompatActivity
+
+import androidx.core.view.WindowCompatimport androidx.lifecycle.lifecycleScope
+
+import com.thiagosilms.javaide.compiler.CloudCompilerimport com.google.android.material.snackbar.Snackbar
+
+import com.thiagosilms.javaide.editor.SmartEditorCacheimport com.thiagosilms.javaide.compiler.CloudCompiler
+
+import com.google.android.material.snackbar.Snackbarimport com.thiagosilms.javaide.editor.SmartEditorCache
+
+import io.github.rosemoe.sora.widget.CodeEditorimport com.thiagosilms.javaide.plugin.PluginManager
+
+import io.github.rosemoe.sora.widget.schemes.EditorColorSchemeimport io.github.rosemoe.sora.widget.CodeEditor
+
 import kotlinx.coroutines.launch
 
 class MainActivity : AppCompatActivity() {
-    private lateinit var editor: CodeEditor
-    private lateinit var editorCache: SmartEditorCache
+
+    private lateinit var editor: CodeEditorclass MainActivity : AppCompatActivity() {
+
+    private lateinit var compiler: CloudCompiler    private lateinit var editor: CodeEditor
+
+    private lateinit var editorCache: SmartEditorCache    private lateinit var editorCache: SmartEditorCache
+
     private lateinit var cloudCompiler: CloudCompiler
-    private lateinit var pluginManager: PluginManager
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+    override fun onCreate(savedInstanceState: Bundle?) {    private lateinit var pluginManager: PluginManager
 
-        // Inicializa componentes
-        editor = findViewById(R.id.editor)
-        editorCache = SmartEditorCache(this)
-        cloudCompiler = CloudCompiler()
-        pluginManager = PluginManager(this)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        super.onCreate(savedInstanceState)    override fun onCreate(savedInstanceState: Bundle?) {
+
+        setContentView(R.layout.activity_main)        super.onCreate(savedInstanceState)
+
+                setContentView(R.layout.activity_main)
 
         setupEditor()
-        initializePlugins()
-    }
 
-    private fun setupEditor() {
-        // Configuração do editor
-        editor.apply {
+        setupCompiler()        // Inicializa componentes
+
+        setupCache()        editor = findViewById(R.id.editor)
+
+    }        editorCache = SmartEditorCache(this)
+
+        cloudCompiler = CloudCompiler()
+
+    private fun setupEditor() {        pluginManager = PluginManager(this)
+
+        editor = CodeEditor(this).apply {
+
+            colorScheme = EditorColorScheme()        setupEditor()
+
+            nonPrintablePaintingFlags = CodeEditor.FLAG_DRAW_WHITESPACE        initializePlugins()
+
+            setTextSize(14f)    }
+
+            setText(editorCache.getLastContent())
+
+            isWordwrap = true    private fun setupEditor() {
+
+        }        // Configuração do editor
+
+    }        editor.apply {
+
             setTextSize(16f)
-            setLineNumberEnabled(true)
-            setWordwrap(false)
-            setPinLineNumber(true)
+
+    private fun setupCompiler() {            setLineNumberEnabled(true)
+
+        compiler = CloudCompiler()            setWordwrap(false)
+
+    }            setPinLineNumber(true)
+
         }
 
-        // Restaura último estado
-        lifecycleScope.launch {
+    private fun setupCache() {
+
+        editorCache = SmartEditorCache(this)        // Restaura último estado
+
+    }        lifecycleScope.launch {
+
             val lastFile = getLastOpenedFile()
-            if (lastFile != null) {
-                editorCache.restoreState(lastFile)?.let { state ->
-                    editor.setText(state.content)
-                    editor.setSelection(state.cursorPosition)
-                    // Restaura outras configurações
-                }
-            }
-        }
 
-        // Auto-save periódico
-        lifecycleScope.launch {
-            while (true) {
-                kotlinx.coroutines.delay(5000) // 5 segundos
-                saveCurrentState()
-            }
-        }
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {            if (lastFile != null) {
+
+        menuInflater.inflate(R.menu.menu_main, menu)                editorCache.restoreState(lastFile)?.let { state ->
+
+        return true                    editor.setText(state.content)
+
+    }                    editor.setSelection(state.cursorPosition)
+
+                    // Restaura outras configurações
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {                }
+
+        return when (item.itemId) {            }
+
+            R.id.action_run -> {        }
+
+                compileAndRun()
+
+                true        // Auto-save periódico
+
+            }        lifecycleScope.launch {
+
+            R.id.action_save -> {            while (true) {
+
+                saveCode()                kotlinx.coroutines.delay(5000) // 5 segundos
+
+                true                saveCurrentState()
+
+            }            }
+
+            else -> super.onOptionsItemSelected(item)        }
+
+        }    }
+
     }
 
     private fun initializePlugins() {
-        lifecycleScope.launch {
-            pluginManager.loadPlugins()
-            pluginManager.notifyPlugins("onEditorReady")
-        }
-    }
 
-    private fun saveCurrentState() {
-        val currentFile = getCurrentFile() ?: return
-        
-        lifecycleScope.launch {
-            editorCache.saveState(
-                filePath = currentFile,
-                content = editor.text.toString(),
-                cursorPosition = editor.cursor.left,
-                scrollPosition = editor.verticalScroll,
+    private fun compileAndRun() {        lifecycleScope.launch {
+
+        val code = editor.text.toString()            pluginManager.loadPlugins()
+
+        compiler.compile(code) { result ->            pluginManager.notifyPlugins("onEditorReady")
+
+            runOnUiThread {        }
+
+                when (result) {    }
+
+                    is CloudCompiler.CompilationResult.Success -> {
+
+                        showMessage("Compilação bem sucedida!")    private fun saveCurrentState() {
+
+                    }        val currentFile = getCurrentFile() ?: return
+
+                    is CloudCompiler.CompilationResult.Error -> {        
+
+                        showMessage("Erro: ${result.message}")        lifecycleScope.launch {
+
+                    }            editorCache.saveState(
+
+                }                filePath = currentFile,
+
+            }                content = editor.text.toString(),
+
+        }                cursorPosition = editor.cursor.left,
+
+    }                scrollPosition = editor.verticalScroll,
+
                 selections = editor.selections.map { 
-                    SmartEditorCache.Selection(it.left, it.right)
-                }
-            )
-        }
+
+    private fun saveCode() {                    SmartEditorCache.Selection(it.left, it.right)
+
+        editorCache.saveContent(editor.text.toString())                }
+
+        showMessage("Código salvo com sucesso!")            )
+
+    }        }
+
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        menuInflater.inflate(R.menu.main_menu, menu)
+    private fun showMessage(message: String) {
+
+        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show()    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+
+    }        menuInflater.inflate(R.menu.main_menu, menu)
+
         return true
-    }
 
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return when (item.itemId) {
-            R.id.action_run -> {
+    override fun onPause() {    }
+
+        super.onPause()
+
+        saveCode()    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+
+    }        return when (item.itemId) {
+
+}            R.id.action_run -> {
                 compileAndRun()
                 true
             }

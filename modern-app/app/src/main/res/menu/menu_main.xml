@@ -1,9 +1,23 @@
-<?xml version="1.0" encoding="utf-8"?>
-<menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="utf-8"?>
+
+<menu xmlns:android="http://schemas.android.com/apk/res/android"<menu xmlns:android="http://schemas.android.com/apk/res/android"
+
+    xmlns:app="http://schemas.android.com/apk/res-auto">    xmlns:app="http://schemas.android.com/apk/res-auto">
+
+    <item    <item
+
+        android:id="@+id/action_run"        android:id="@+id/action_settings"
+
+        android:icon="@drawable/ic_play"        android:orderInCategory="100"
+
+        android:title="@string/action_run"        android:title="@string/action_settings"
+
+        app:showAsAction="always" />        app:showAsAction="never" />
+
+    </menu>
     <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="100"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+        android:id="@+id/action_save"
+        android:icon="@android:drawable/ic_menu_save"
+        android:title="@string/action_save"
+        app:showAsAction="always" />
 </menu>

@@ -1,2 +1,3 @@
-include ':app'
-rootProject.name = 'java-n-ide-modern'
+rootProject.name = "Java N-IDE Premium"include ':app'
+
+include ':app'rootProject.name = 'java-n-ide-modern'

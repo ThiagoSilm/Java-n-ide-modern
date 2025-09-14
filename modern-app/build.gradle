@@ -1,21 +1,38 @@
-buildscript {
-    ext {
-        kotlin_version = '1.8.20'
-    }
-    repositories {
-        google()
-        mavenCentral()
-    }
-    dependencies {
-        classpath 'com.android.tools.build:gradle:8.1.0'
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-    }
-}
+buildscript {buildscript {
 
-allprojects {
-    repositories {
+    repositories {    ext {
+
+        google()        kotlin_version = '1.8.20'
+
+        mavenCentral()    }
+
+    }    repositories {
+
+    dependencies {        google()
+
+        classpath 'com.android.tools.build:gradle:8.1.0'        mavenCentral()
+
+        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10'    }
+
+    }    dependencies {
+
+}        classpath 'com.android.tools.build:gradle:8.1.0'
+
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+
+allprojects {    }
+
+    repositories {}
+
         google()
-        mavenCentral()
+
+        mavenCentral()allprojects {
+
+        maven { url 'https://jitpack.io' }    repositories {
+
+    }        google()
+
+}        mavenCentral()
         maven { url "https://jitpack.io" }
     }
 }

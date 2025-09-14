@@ -1,24 +1,44 @@
-package com.thiagosilms.javaide.plugin
+package com.thiagosilms.javaide.pluginpackage com.thiagosilms.javaide.plugin
 
-import android.content.Context
-import dalvik.system.DexClassLoader
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
-import java.io.File
-import java.net.URL
 
-interface JavaIDEPlugin {
-    fun onInit()
-    fun getName(): String
-    fun getDescription(): String
-    fun getVersion(): String
-    fun onEditorAction(action: String, data: Map<String, Any>)
-}
 
-class PluginManager(private val context: Context) {
-    private val plugins = mutableMapOf<String, JavaIDEPlugin>()
-    private val pluginDir = File(context.filesDir, "plugins")
-    
+object PluginManager {import android.content.Context
+
+    // Premium: todos os plugins habilitadosimport dalvik.system.DexClassLoader
+
+    fun isPluginEnabled(pluginId: String): Boolean = trueimport kotlinx.coroutines.Dispatchers
+
+    import kotlinx.coroutines.withContext
+
+    fun installPlugin(pluginId: String): Boolean = trueimport java.io.File
+
+    import java.net.URL
+
+    fun uninstallPlugin(pluginId: String): Boolean = true
+
+    interface JavaIDEPlugin {
+
+    fun getInstalledPlugins(): List<String> = listOf(    fun onInit()
+
+        "git-integration",    fun getName(): String
+
+        "cloud-sync",    fun getDescription(): String
+
+        "ai-code-completion",    fun getVersion(): String
+
+        "advanced-debugging",    fun onEditorAction(action: String, data: Map<String, Any>)
+
+        "performance-profiler",}
+
+        "code-analysis",
+
+        "custom-themes",class PluginManager(private val context: Context) {
+
+        "live-templates"    private val plugins = mutableMapOf<String, JavaIDEPlugin>()
+
+    )    private val pluginDir = File(context.filesDir, "plugins")
+
+}    
     init {
         pluginDir.mkdirs()
     }

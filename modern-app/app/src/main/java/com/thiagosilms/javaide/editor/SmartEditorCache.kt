@@ -1,32 +1,60 @@
-package com.thiagosilms.javaide.editor
+package com.thiagosilms.javaide.editorpackage com.thiagosilms.javaide.editor
 
-import android.content.Context
-import androidx.room.*
+
+
+import android.content.Contextimport android.content.Context
+
+import android.content.SharedPreferencesimport androidx.room.*
+
 import com.google.gson.Gson
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
-import java.io.File
 
-@Entity(tableName = "editor_cache")
-data class EditorCache(
-    @PrimaryKey val filePath: String,
-    val content: String,
+class SmartEditorCache(context: Context) {import kotlinx.coroutines.Dispatchers
+
+    private val prefs: SharedPreferences = context.getSharedPreferences("editor_cache", Context.MODE_PRIVATE)import kotlinx.coroutines.flow.Flow
+
+    private val defaultContent = """import kotlinx.coroutines.withContext
+
+        public class Main {import java.io.File
+
+            public static void main(String[] args) {
+
+                System.out.println("Hello World!");@Entity(tableName = "editor_cache")
+
+            }data class EditorCache(
+
+        }    @PrimaryKey val filePath: String,
+
+    """.trimIndent()    val content: String,
+
     val timestamp: Long,
-    val cursor: Int,
-    val scroll: Float,
-    val selections: String // JSON array of selections
+
+    fun saveContent(content: String) {    val cursor: Int,
+
+        prefs.edit().putString("last_content", content).apply()    val scroll: Float,
+
+    }    val selections: String // JSON array of selections
+
 )
 
-@Dao
-interface EditorCacheDao {
+    fun getLastContent(): String {
+
+        return prefs.getString("last_content", defaultContent) ?: defaultContent@Dao
+
+    }interface EditorCacheDao {
+
     @Query("SELECT * FROM editor_cache WHERE filePath = :path")
-    fun getCache(path: String): EditorCache?
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun saveCache(cache: EditorCache)
+    // Modo premium sempre ativo    fun getCache(path: String): EditorCache?
 
-    @Query("DELETE FROM editor_cache WHERE timestamp < :threshold")
+    fun enableCloudSync() {
+
+        // Simulando sincronização com nuvem    @Insert(onConflict = OnConflictStrategy.REPLACE)
+
+        prefs.edit().putBoolean("cloud_sync_enabled", true).apply()    suspend fun saveCache(cache: EditorCache)
+
+    }
+
+}    @Query("DELETE FROM editor_cache WHERE timestamp < :threshold")
     suspend fun cleanOldCache(threshold: Long)
 }
 

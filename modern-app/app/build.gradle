@@ -1,55 +1,106 @@
-plugins {
-    id 'com.android.application'
-    id 'kotlin-android'
-    id 'kotlin-kapt'
+plugins {plugins {
+
+    id 'com.android.application'    id 'com.android.application'
+
+    id 'org.jetbrains.kotlin.android'    id 'kotlin-android'
+
+}    id 'kotlin-kapt'
+
 }
 
 android {
-    namespace 'com.duy.ide'
+
+    namespace 'com.thiagosilms.javaide'android {
+
+    compileSdk 34    namespace 'com.duy.ide'
+
     compileSdk 34
 
     defaultConfig {
-        applicationId "com.duy.ide"
-        minSdk 21
-        targetSdk 34
-        versionCode 1
-        versionName "2.0.0"
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-    }
+        applicationId "com.thiagosilms.javaide"    defaultConfig {
 
-    buildTypes {
-        release {
+        minSdk 21        applicationId "com.duy.ide"
+
+        targetSdk 34        minSdk 21
+
+        versionCode 1        targetSdk 34
+
+        versionName "1.0"        versionCode 1
+
+    }        versionName "2.0.0"
+
+
+
+    buildTypes {        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+
+        release {    }
+
             minifyEnabled true
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
 
-    buildFeatures {
-        viewBinding true
-    }
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'    buildTypes {
 
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_17
+        }        release {
+
+    }            minifyEnabled true
+
+                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+
+    compileOptions {        }
+
+        sourceCompatibility JavaVersion.VERSION_17    }
+
         targetCompatibility JavaVersion.VERSION_17
-    }
 
-    kotlinOptions {
+    }    buildFeatures {
+
+            viewBinding true
+
+    kotlinOptions {    }
+
         jvmTarget = '17'
+
+    }    compileOptions {
+
+            sourceCompatibility JavaVersion.VERSION_17
+
+    buildFeatures {        targetCompatibility JavaVersion.VERSION_17
+
+        viewBinding true    }
+
     }
 
-    packagingOptions {
-        resources {
-            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-        }
-    }
-}
+}    kotlinOptions {
 
-dependencies {
-    // AndroidX Core
-    implementation 'androidx.core:core-ktx:1.10.1'
-    implementation 'androidx.appcompat:appcompat:1.6.1'
-    implementation 'com.google.android.material:material:1.9.0'
+        jvmTarget = '17'
+
+dependencies {    }
+
+    implementation 'androidx.core:core-ktx:1.12.0'
+
+    implementation 'androidx.appcompat:appcompat:1.6.1'    packagingOptions {
+
+    implementation 'com.google.android.material:material:1.10.0'        resources {
+
+    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+
+            }
+
+    // Editor    }
+
+    implementation 'io.github.Rosemoe.sora-editor:editor:0.21.1'}
+
+    implementation 'io.github.Rosemoe.sora-editor:language-java:0.21.1'
+
+    implementation 'io.github.Rosemoe.sora-editor:language-textmate:0.21.1'dependencies {
+
+        // AndroidX Core
+
+    // Java Compiler    implementation 'androidx.core:core-ktx:1.10.1'
+
+    implementation files('libs/ecj-3.21.0.jar')    implementation 'androidx.appcompat:appcompat:1.6.1'
+
+}    implementation 'com.google.android.material:material:1.9.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
     // Lifecycle e Coroutines
