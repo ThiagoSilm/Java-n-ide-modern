@@ -1,16 +1,16 @@
 {
   "version": "1.0.0",
-  "name": "Java N-IDE",
+  "name": "java-n-ide-modern",
   "description": "IDE Android moderna para desenvolvimento Java/Kotlin",
-  "author": "Java N-IDE Team",
+  "author": "Thiago Silva",
   "license": "MIT",
-  "homepage": "https://github.com/shenghuntianlang/java-n-ide-upgraded",
+  "homepage": "https://github.com/ThiagoSilm/Java-n-ide-modern",
   "bugs": {
-    "url": "https://github.com/shenghuntianlang/java-n-ide-upgraded/issues"
+    "url": "https://github.com/ThiagoSilm/Java-n-ide-modern/issues"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/shenghuntianlang/java-n-ide-upgraded.git"
+    "url": "git+https://github.com/ThiagoSilm/Java-n-ide-modern.git"
   },
   "keywords": [
     "android",
