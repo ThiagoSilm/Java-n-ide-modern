@@ -1,0 +1,38 @@
+name: 📚 Documentation
+description: Sugira melhorias na documentação
+title: "[Docs]: "
+labels: ["documentation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Ajude-nos a melhorar a documentação!
+  - type: input
+    id: page
+    attributes:
+      label: Página/Seção
+      description: Qual página ou seção precisa ser melhorada?
+      placeholder: "ex: README.md, Guia de Instalação"
+    validations:
+      required: true
+  - type: textarea
+    id: current
+    attributes:
+      label: Documentação atual
+      description: O que há de errado ou incompleto na documentação atual?
+    validations:
+      required: true
+  - type: textarea
+    id: suggestion
+    attributes:
+      label: Sugestão de melhoria
+      description: Como você sugere que a documentação seja melhorada?
+    validations:
+      required: true
+  - type: checkboxes
+    id: terms
+    attributes:
+      label: Confirmação
+      options:
+        - label: Verifiquei que não existe uma sugestão similar
+          required: true

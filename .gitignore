@@ -1,0 +1,51 @@
+# Arquivos e diretórios gerados pelo Android Studio
+*.iml
+.gradle/
+/local.properties
+/.idea/
+.DS_Store
+/build
+/captures
+.externalNativeBuild
+.cxx
+
+# Arquivos de build
+/app/build/
+/app/release/
+*.apk
+*.aab
+*.ap_
+
+# Arquivos de assinatura
+*.jks
+*.keystore
+keystore.properties
+
+# Logs
+*.log
+
+# VS Code
+.vscode/
+*.code-workspace
+
+# Arquivos temporários
+*.tmp
+*.temp
+*.swp
+
+# Dependências
+/app/libs/
+/node_modules/
+
+# Arquivos específicos do projeto
+app/google-services.json
+/output.json
+
+# Crashlytics
+crashlytics.properties
+crashlytics-build.properties
+com_crashlytics_export_strings.xml
+
+# Backups
+*.bak
+*.old
