@@ -4,6 +4,10 @@ Um IDE Android moderno e poderoso para desenvolvimento Java/Kotlin com recursos 
 
 ![Logo do Java N-IDE](assets/images/logo.png)
 
+## 📱 Download
+
+[Baixar APK v1.0.0](https://github.com/ThiagoSilm/Java-n-ide-modern/releases/download/v1.0.0/app-release.apk)
+
 ## ✨ Recursos Principais
 
 - 🧪 Sistema avançado de testes
