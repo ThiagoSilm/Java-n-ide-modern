@@ -1,0 +1,31 @@
+{
+  "version": "1.0.0",
+  "name": "Java N-IDE",
+  "description": "IDE Android moderna para desenvolvimento Java/Kotlin",
+  "author": "Java N-IDE Team",
+  "license": "MIT",
+  "homepage": "https://github.com/shenghuntianlang/java-n-ide-upgraded",
+  "bugs": {
+    "url": "https://github.com/shenghuntianlang/java-n-ide-upgraded/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/shenghuntianlang/java-n-ide-upgraded.git"
+  },
+  "keywords": [
+    "android",
+    "ide",
+    "java",
+    "kotlin",
+    "development",
+    "testing"
+  ],
+  "dependencies": {
+    "kotlin": "1.8.20",
+    "androidGradlePlugin": "8.1.1",
+    "compose": "1.5.1"
+  },
+  "engines": {
+    "android": ">=8.0.0"
+  }
+}
