@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Material 3 Dynamic Colors - Light -->
+    <color name="primary">@android:color/system_accent1_600</color>
+    <color name="primary_variant">@android:color/system_accent1_700</color>
+    <color name="on_primary">@android:color/system_accent1_0</color>
+    
+    <color name="secondary">@android:color/system_accent2_600</color>
+    <color name="secondary_variant">@android:color/system_accent2_700</color>
+    <color name="on_secondary">@android:color/system_accent2_0</color>
+    
+    <color name="background">@android:color/system_neutral1_10</color>
+    <color name="on_background">@android:color/system_neutral1_900</color>
+    
+    <color name="surface">@android:color/system_neutral1_50</color>
+    <color name="on_surface">@android:color/system_neutral1_900</color>
+    
+    <!-- Editor Colors -->
+    <color name="editor_background">#FFFFFF</color>
+    <color name="editor_foreground">#000000</color>
+    <color name="editor_line_number">#808080</color>
+    <color name="editor_selection">#4D80CBC4</color>
+    <color name="editor_cursor">#000000</color>
+    
+    <!-- Syntax Highlighting -->
+    <color name="keyword">#D32F2F</color>
+    <color name="type">#1976D2</color>
+    <color name="string">#388E3C</color>
+    <color name="comment">#9E9E9E</color>
+    <color name="number">#F57C00</color>
+    <color name="operator">#7B1FA2</color>
+    <color name="annotation">#0097A7</color>
+</resources>

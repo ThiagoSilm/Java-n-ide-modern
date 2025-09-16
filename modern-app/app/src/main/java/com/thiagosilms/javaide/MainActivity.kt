@@ -1,244 +1,169 @@
-package com.thiagosilms.javaidepackage com.thiagosilms.javaide
+package com.thiagosilms.javaide
 
-
-
-import android.os.Bundleimport android.os.Bundle
-
-import android.view.Menuimport android.view.Menu
-
-import android.view.MenuItemimport android.view.MenuItem
-
-import androidx.appcompat.app.AppCompatActivityimport androidx.appcompat.app.AppCompatActivity
-
-import androidx.core.view.WindowCompatimport androidx.lifecycle.lifecycleScope
-
-import com.thiagosilms.javaide.compiler.CloudCompilerimport com.google.android.material.snackbar.Snackbar
-
-import com.thiagosilms.javaide.editor.SmartEditorCacheimport com.thiagosilms.javaide.compiler.CloudCompiler
-
-import com.google.android.material.snackbar.Snackbarimport com.thiagosilms.javaide.editor.SmartEditorCache
-
-import io.github.rosemoe.sora.widget.CodeEditorimport com.thiagosilms.javaide.plugin.PluginManager
-
-import io.github.rosemoe.sora.widget.schemes.EditorColorSchemeimport io.github.rosemoe.sora.widget.CodeEditor
-
+import android.os.Bundle
+import android.view.Menu
+import android.view.MenuItem
+import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowCompat
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
+import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.snackbar.Snackbar
+import com.thiagosilms.javaide.core.cloud.CloudCompiler
+import com.thiagosilms.javaide.core.plugin.PluginManager
+import com.thiagosilms.javaide.databinding.ActivityMainBinding
+import com.thiagosilms.javaide.editor.SmartEditorCache
+import com.thiagosilms.javaide.ui.editor.EditorViewModel
+import dagger.hilt.android.AndroidEntryPoint
+import io.github.rosemoe.sora.widget.CodeEditor
+import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
+@AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var editor: CodeEditorclass MainActivity : AppCompatActivity() {
+    private lateinit var binding: ActivityMainBinding
+    private val viewModel: EditorViewModel by viewModels()
 
-    private lateinit var compiler: CloudCompiler    private lateinit var editor: CodeEditor
+    @Inject
+    lateinit var cloudCompiler: CloudCompiler
 
-    private lateinit var editorCache: SmartEditorCache    private lateinit var editorCache: SmartEditorCache
+    @Inject
+    lateinit var pluginManager: PluginManager
 
-    private lateinit var cloudCompiler: CloudCompiler
+    @Inject
+    lateinit var editorCache: SmartEditorCache
 
-    override fun onCreate(savedInstanceState: Bundle?) {    private lateinit var pluginManager: PluginManager
-
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         WindowCompat.setDecorFitsSystemWindows(window, false)
-
-        super.onCreate(savedInstanceState)    override fun onCreate(savedInstanceState: Bundle?) {
-
-        setContentView(R.layout.activity_main)        super.onCreate(savedInstanceState)
-
-                setContentView(R.layout.activity_main)
+        
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
 
         setupEditor()
+        observeState()
+        setupListeners()
+    }
 
-        setupCompiler()        // Inicializa componentes
-
-        setupCache()        editor = findViewById(R.id.editor)
-
-    }        editorCache = SmartEditorCache(this)
-
-        cloudCompiler = CloudCompiler()
-
-    private fun setupEditor() {        pluginManager = PluginManager(this)
-
-        editor = CodeEditor(this).apply {
-
-            colorScheme = EditorColorScheme()        setupEditor()
-
-            nonPrintablePaintingFlags = CodeEditor.FLAG_DRAW_WHITESPACE        initializePlugins()
-
-            setTextSize(14f)    }
-
-            setText(editorCache.getLastContent())
-
-            isWordwrap = true    private fun setupEditor() {
-
-        }        // Configuração do editor
-
-    }        editor.apply {
-
-            setTextSize(16f)
-
-    private fun setupCompiler() {            setLineNumberEnabled(true)
-
-        compiler = CloudCompiler()            setWordwrap(false)
-
-    }            setPinLineNumber(true)
-
+    private fun setupEditor() {
+        binding.codeEditor.apply {
+            colorScheme = EditorColorScheme()
+            nonPrintablePaintingFlags = CodeEditor.FLAG_DRAW_WHITESPACE_LEADING or
+                                      CodeEditor.FLAG_DRAW_WHITESPACE_INNER or
+                                      CodeEditor.FLAG_DRAW_LINE_SEPARATOR
+            textSize = 16f
+            isWordwrap = true
+            isLineNumberEnabled = true
         }
 
-    private fun setupCache() {
-
-        editorCache = SmartEditorCache(this)        // Restaura último estado
-
-    }        lifecycleScope.launch {
-
-            val lastFile = getLastOpenedFile()
-
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {            if (lastFile != null) {
-
-        menuInflater.inflate(R.menu.menu_main, menu)                editorCache.restoreState(lastFile)?.let { state ->
-
-        return true                    editor.setText(state.content)
-
-    }                    editor.setSelection(state.cursorPosition)
-
-                    // Restaura outras configurações
-
-    override fun onOptionsItemSelected(item: MenuItem): Boolean {                }
-
-        return when (item.itemId) {            }
-
-            R.id.action_run -> {        }
-
-                compileAndRun()
-
-                true        // Auto-save periódico
-
-            }        lifecycleScope.launch {
-
-            R.id.action_save -> {            while (true) {
-
-                saveCode()                kotlinx.coroutines.delay(5000) // 5 segundos
-
-                true                saveCurrentState()
-
-            }            }
-
-            else -> super.onOptionsItemSelected(item)        }
-
-        }    }
-
+        // Restaurar último estado
+        lifecycleScope.launch {
+            editorCache.getLastState()?.let { state ->
+                binding.codeEditor.setText(state.content)
+                binding.codeEditor.setSelection(state.cursorPosition)
+            }
+        }
     }
 
-    private fun initializePlugins() {
-
-    private fun compileAndRun() {        lifecycleScope.launch {
-
-        val code = editor.text.toString()            pluginManager.loadPlugins()
-
-        compiler.compile(code) { result ->            pluginManager.notifyPlugins("onEditorReady")
-
-            runOnUiThread {        }
-
-                when (result) {    }
-
-                    is CloudCompiler.CompilationResult.Success -> {
-
-                        showMessage("Compilação bem sucedida!")    private fun saveCurrentState() {
-
-                    }        val currentFile = getCurrentFile() ?: return
-
-                    is CloudCompiler.CompilationResult.Error -> {        
-
-                        showMessage("Erro: ${result.message}")        lifecycleScope.launch {
-
-                    }            editorCache.saveState(
-
-                }                filePath = currentFile,
-
-            }                content = editor.text.toString(),
-
-        }                cursorPosition = editor.cursor.left,
-
-    }                scrollPosition = editor.verticalScroll,
-
-                selections = editor.selections.map { 
-
-    private fun saveCode() {                    SmartEditorCache.Selection(it.left, it.right)
-
-        editorCache.saveContent(editor.text.toString())                }
-
-        showMessage("Código salvo com sucesso!")            )
-
-    }        }
-
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                viewModel.editorState.collect { state ->
+                    when (state) {
+                        is EditorState.Success -> handleSuccess(state)
+                        is EditorState.Error -> handleError(state.message)
+                        is EditorState.Loading -> showLoading()
+                    }
+                }
+            }
+        }
     }
 
-    private fun showMessage(message: String) {
+    private fun setupListeners() {
+        binding.fabRun.setOnClickListener {
+            val code = binding.codeEditor.text.toString()
+            viewModel.compileAndRun(code)
+        }
+    }
 
-        Snackbar.make(findViewById(android.R.id.content), message, Snackbar.LENGTH_SHORT).show()    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-
-    }        menuInflater.inflate(R.menu.main_menu, menu)
-
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_editor, menu)
         return true
+    }
 
-    override fun onPause() {    }
-
-        super.onPause()
-
-        saveCode()    override fun onOptionsItemSelected(item: MenuItem): Boolean {
-
-    }        return when (item.itemId) {
-
-}            R.id.action_run -> {
-                compileAndRun()
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_save -> {
+                saveCurrentFile()
                 true
             }
-            R.id.action_save -> {
-                saveCurrentState()
-                Snackbar.make(editor, "Arquivo salvo", Snackbar.LENGTH_SHORT).show()
+            R.id.action_settings -> {
+                showSettings()
                 true
             }
             else -> super.onOptionsItemSelected(item)
         }
     }
 
-    private fun compileAndRun() {
-        val code = editor.text.toString()
-        
+    private fun saveCurrentFile() {
         lifecycleScope.launch {
-            try {
-                val result = cloudCompiler.compileRemotely(code)
-                if (result.success) {
-                    // Executa o bytecode ou mostra resultado
-                    showOutput(result.message)
-                } else {
-                    showError(result.message)
-                }
-            } catch (e: Exception) {
-                showError("Erro: ${e.message}")
+            val content = binding.codeEditor.text.toString()
+            if (viewModel.saveFile(content)) {
+                Snackbar.make(binding.root, R.string.file_saved, Snackbar.LENGTH_SHORT).show()
+            } else {
+                Snackbar.make(binding.root, R.string.error_saving_file, Snackbar.LENGTH_LONG).show()
             }
         }
     }
 
-    private fun showOutput(message: String) {
-        Snackbar.make(editor, message, Snackbar.LENGTH_LONG).show()
+    private fun showSettings() {
+        // Implementar navegação para tela de configurações
     }
 
-    private fun showError(message: String) {
-        Snackbar.make(editor, message, Snackbar.LENGTH_LONG)
-            .setBackgroundTint(getColor(R.color.error))
+    private fun handleSuccess(state: EditorState.Success) {
+        binding.progressBar.hide()
+        when (state) {
+            is EditorState.Compiled -> showOutput(state.output)
+            is EditorState.Saved -> Snackbar.make(binding.root, R.string.file_saved, Snackbar.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun handleError(message: String) {
+        binding.progressBar.hide()
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.error)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok, null)
             .show()
     }
 
-    private fun getCurrentFile(): String? {
-        // Implementar lógica para obter arquivo atual
-        return null
+    private fun showLoading() {
+        binding.progressBar.show()
     }
 
-    private fun getLastOpenedFile(): String? {
-        // Implementar lógica para obter último arquivo
-        return null
+    private fun showOutput(output: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.output)
+            .setMessage(output)
+            .setPositiveButton(R.string.ok, null)
+            .show()
     }
 
     override fun onPause() {
         super.onPause()
-        saveCurrentState()
+        // Salvar estado do editor
+        lifecycleScope.launch {
+            editorCache.saveState(
+                EditorState(
+                    content = binding.codeEditor.text.toString(),
+                    cursorPosition = binding.codeEditor.selectionEnd
+                )
+            )
+        }
     }
 }

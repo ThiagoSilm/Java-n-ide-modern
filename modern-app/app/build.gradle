@@ -1,132 +1,95 @@
-plugins {plugins {
-
-    id 'com.android.application'    id 'com.android.application'
-
-    id 'org.jetbrains.kotlin.android'    id 'kotlin-android'
-
-}    id 'kotlin-kapt'
-
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlin-kapt'
+    id 'dagger.hilt.android.plugin'
 }
 
 android {
-
-    namespace 'com.thiagosilms.javaide'android {
-
-    compileSdk 34    namespace 'com.duy.ide'
-
+    namespace 'com.thiagosilms.javaide'
     compileSdk 34
 
     defaultConfig {
-
-        applicationId "com.thiagosilms.javaide"    defaultConfig {
-
-        minSdk 21        applicationId "com.duy.ide"
-
-        targetSdk 34        minSdk 21
-
-        versionCode 1        targetSdk 34
-
-        versionName "1.0"        versionCode 1
-
-    }        versionName "2.0.0"
-
-
-
-    buildTypes {        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-
-        release {    }
-
-            minifyEnabled true
-
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'    buildTypes {
-
-        }        release {
-
-    }            minifyEnabled true
-
-                proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-
-    compileOptions {        }
-
-        sourceCompatibility JavaVersion.VERSION_17    }
-
-        targetCompatibility JavaVersion.VERSION_17
-
-    }    buildFeatures {
-
-            viewBinding true
-
-    kotlinOptions {    }
-
-        jvmTarget = '17'
-
-    }    compileOptions {
-
-            sourceCompatibility JavaVersion.VERSION_17
-
-    buildFeatures {        targetCompatibility JavaVersion.VERSION_17
-
-        viewBinding true    }
-
+        applicationId "com.thiagosilms.javaide"
+        minSdk 21
+        targetSdk 34
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
 
-}    kotlinOptions {
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+        }
+    }
 
+    buildFeatures {
+        viewBinding true
+        compose true
+    }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion "1.5.4"
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    kotlinOptions {
         jvmTarget = '17'
+    }
 
-dependencies {    }
+    packaging {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+}
 
+dependencies {
     implementation 'androidx.core:core-ktx:1.12.0'
-
-    implementation 'androidx.appcompat:appcompat:1.6.1'    packagingOptions {
-
-    implementation 'com.google.android.material:material:1.10.0'        resources {
-
-    implementation 'androidx.constraintlayout:constraintlayout:2.1.4'            excludes += '/META-INF/{AL2.0,LGPL2.1}'
-
-            }
-
-    // Editor    }
-
-    implementation 'io.github.Rosemoe.sora-editor:editor:0.21.1'}
-
-    implementation 'io.github.Rosemoe.sora-editor:language-java:0.21.1'
-
-    implementation 'io.github.Rosemoe.sora-editor:language-textmate:0.21.1'dependencies {
-
-        // AndroidX Core
-
-    // Java Compiler    implementation 'androidx.core:core-ktx:1.10.1'
-
-    implementation files('libs/ecj-3.21.0.jar')    implementation 'androidx.appcompat:appcompat:1.6.1'
-
-}    implementation 'com.google.android.material:material:1.9.0'
+    implementation 'androidx.appcompat:appcompat:1.6.1'
+    implementation 'androidx.activity:activity-ktx:1.8.2'
+    implementation 'androidx.fragment:fragment-ktx:1.6.2'
+    implementation 'com.google.android.material:material:1.11.0'
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
-
-    // Lifecycle e Coroutines
-    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.6.1'
-    implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.3'
-
-    // Room para cache
-    implementation "androidx.room:room-runtime:2.5.2"
-    implementation "androidx.room:room-ktx:2.5.2"
-    kapt "androidx.room:room-compiler:2.5.2"
-
-    // Network
-    implementation 'com.squareup.okhttp3:okhttp:4.11.0'
-    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'androidx.lifecycle:lifecycle-viewmodel-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-livedata-ktx:2.7.0'
+    implementation 'androidx.lifecycle:lifecycle-runtime-ktx:2.7.0'
+    implementation 'androidx.navigation:navigation-fragment-ktx:2.7.6'
+    implementation 'androidx.navigation:navigation-ui-ktx:2.7.6'
     
-    // Code Editor
+    // Hilt
+    implementation 'com.google.dagger:hilt-android:2.50'
+    kapt 'com.google.dagger:hilt-compiler:2.50'
+
+    // Compose
+    implementation platform('androidx.compose:compose-bom:2024.01.00')
+    implementation 'androidx.compose.ui:ui'
+    implementation 'androidx.compose.material3:material3'
+    implementation 'androidx.compose.ui:ui-tooling-preview'
+    debugImplementation 'androidx.compose.ui:ui-tooling'
+
+    // Editor
     implementation 'io.github.Rosemoe.sora-editor:editor:0.21.1'
     implementation 'io.github.Rosemoe.sora-editor:language-java:0.21.1'
     implementation 'io.github.Rosemoe.sora-editor:language-textmate:0.21.1'
-
-    // JSON
-    implementation 'com.google.code.gson:gson:2.10.1'
-
-    // Compilador Java embutido
     implementation files('libs/ecj-3.21.0.jar')
+
+    // Cloud Features
+    implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    implementation 'com.squareup.retrofit2:converter-gson:2.9.0'
+    implementation 'com.squareup.okhttp3:okhttp:4.12.0'
+    implementation 'com.squareup.okhttp3:logging-interceptor:4.12.0'
+
+    // Google Drive API
+    implementation 'com.google.android.gms:play-services-auth:20.7.0'
+    implementation 'com.google.api-client:google-api-client-android:2.2.0'
+    implementation 'com.google.apis:google-api-services-drive:v3-rev20231128-2.0.0'
 
     // Testing
     testImplementation 'junit:junit:4.13.2'

@@ -1,39 +1,33 @@
-buildscript {buildscript {
-
-    repositories {    ext {
-
-        google()        kotlin_version = '1.8.20'
-
-        mavenCentral()    }
-
-    }    repositories {
-
-    dependencies {        google()
-
-        classpath 'com.android.tools.build:gradle:8.1.0'        mavenCentral()
-
-        classpath 'org.jetbrains.kotlin:kotlin-gradle-plugin:1.9.10'    }
-
-    }    dependencies {
-
-}        classpath 'com.android.tools.build:gradle:8.1.0'
-
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
-
-allprojects {    }
-
-    repositories {}
-
+buildscript {
+    ext {
+        kotlin_version = '1.9.22'
+        compose_version = '1.5.4'
+    }
+    
+    repositories {
         google()
+        mavenCentral()
+    }
+    
+    dependencies {
+        classpath 'com.android.tools.build:gradle:8.2.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath 'com.google.dagger:hilt-android-gradle-plugin:2.50'
+        classpath 'androidx.navigation:navigation-safe-args-gradle-plugin:2.7.6'
+    }
+}
 
-        mavenCentral()allprojects {
+plugins {
+    id 'com.android.application' version '8.2.0' apply false
+    id 'com.android.library' version '8.2.0' apply false
+    id 'org.jetbrains.kotlin.android' version '1.9.22' apply false
+}
 
-        maven { url 'https://jitpack.io' }    repositories {
-
-    }        google()
-
-}        mavenCentral()
-        maven { url "https://jitpack.io" }
+allprojects {
+    repositories {
+        google()
+        mavenCentral()
+        maven { url 'https://jitpack.io' }
     }
 }
 
