@@ -1,40 +1,53 @@
-<?xml version="1.0" encoding="utf-8"?><?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
 
-<manifest xmlns:android="http://schemas.android.com/apk/res/android"><manifest xmlns:android="http://schemas.android.com/apk/res/android">
-
+    <!-- Permissões de Rede (Essenciais para um IDE que pode baixar bibliotecas) -->
     <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />    <uses-permission android:name="android.permission.INTERNET" />
-
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
-
-    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />        android:maxSdkVersion="32" />
-
+    <!-- Permissões de Armazenamento -->
+    <!-- Para Android 10 a 12 (API 29-32): usa armazenamento legado -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+        android:maxSdkVersion="32" />
 
-    <application        android:maxSdkVersion="32" />
+    <!-- Para Android 13+ (API 33+): usa permissões granulares de mídia -->
+    <!-- Escolha APENAS as que seu app realmente precisa. Assumi que um IDE precisa de imagens/vídeos? -->
+    <!-- Se for apenas para arquivos de código, essas podem ser removidas. -->
+    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
+    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
 
-        android:allowBackup="true"    <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
-
-        android:icon="@mipmap/ic_launcher"    <uses-permission android:name="android.permission.READ_MEDIA_VIDEO" />
-
-        android:label="@string/app_name"    <uses-permission android:name="android.permission.READ_MEDIA_AUDIO" />
-
-        android:roundIcon="@mipmap/ic_launcher_round"    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-
+    <!-- Para acesso a todos os arquivos em Android 11+ (API 30+) -->
+    <!-- Necessário se o IDE precisa acessar diretórios específicos fora do escopo de mídia -->
+    <application
+        android:requestLegacyExternalStorage="true"
+        tools:targetApi="30">
+        
+    <application
+        android:name=".JavaIDEApplication"
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
+        android:theme="@style/Theme.JavaIDE">
 
-        android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar">    <application
+        <activity
+            android:name=".MainActivity"
+            android:exported="true"
+            android:windowSoftInputMode="adjustResize">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-                android:name=".JavaIDEApplication"
+    </application>
 
-        <activity        android:allowBackup="true"
-
-            android:name=".MainActivity"        android:icon="@mipmap/ic_launcher"
-
-            android:exported="true"        android:label="@string/app_name"
-
-            android:windowSoftInputMode="adjustResize">        android:roundIcon="@mipmap/ic_launcher_round"
+</manifest>            android:windowSoftInputMode="adjustResize">        android:roundIcon="@mipmap/ic_launcher_round"
 
             <intent-filter>        android:supportsRtl="true"
 
