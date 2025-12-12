@@ -22,6 +22,18 @@ import io.github.rosemoe.sora.widget.schemes.EditorColorScheme
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
+// [CORREÇÃO 2] Classe de dados para o estado persistente do editor (conteúdo e cursor)
+data class EditorPersistedState(val content: String, val cursorPosition: Int)
+
+// [CORREÇÃO 1] Estados simples para a UI baseados no resultado das operações do ViewModel
+sealed interface EditorUiState {
+    object Idle : EditorUiState
+    object Loading : EditorUiState
+    data class Success(val output: String) : EditorUiState // Para compilação/execução bem-sucedida
+    data class Error(val message: String) : EditorUiState
+    object FileSaved : EditorUiState // Estado específico para salvar
+}
+
 @AndroidEntryPoint
 class MainActivity : AppCompatActivity() {
 
@@ -35,6 +47,158 @@ class MainActivity : AppCompatActivity() {
     lateinit var pluginManager: PluginManager
 
     @Inject
+    lateinit var editorCache: SmartEditorCache
+
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        WindowCompat.setDecorFitsSystemWindows(window, false)
+
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        setContentView(binding.root)
+        setSupportActionBar(binding.toolbar)
+
+        // [CORREÇÃO 4] Verificação de inicialização (opcional, mas boa prática)
+        checkInjectedDependencies()
+
+        setupEditor()
+        observeState()
+        setupListeners()
+    }
+
+    private fun checkInjectedDependencies() {
+        // Garantir que as dependências foram injetadas antes do uso
+        if (!::cloudCompiler.isInitialized || !::pluginManager.isInitialized || !::editorCache.isInitialized) {
+            throw IllegalStateException("Dependências não foram injetadas pelo Hilt. Verifique os módulos.")
+        }
+    }
+
+    private fun setupEditor() {
+        binding.codeEditor.apply {
+            colorScheme = EditorColorScheme()
+            nonPrintablePaintingFlags = CodeEditor.FLAG_DRAW_WHITESPACE_LEADING or
+                    CodeEditor.FLAG_DRAW_WHITESPACE_INNER or
+                    CodeEditor.FLAG_DRAW_LINE_SEPARATOR
+            textSize = 16f
+            isWordwrap = true
+            isLineNumberEnabled = true
+        }
+
+        // Restaurar último estado
+        lifecycleScope.launch {
+            // [CORREÇÃO 2] Agora o cache retorna o tipo correto EditorPersistedState
+            val cachedState = editorCache.getLastState()
+            cachedState?.let { state ->
+                binding.codeEditor.setText(state.content)
+                binding.codeEditor.setSelection(state.cursorPosition)
+            }
+        }
+    }
+
+    private fun observeState() {
+        lifecycleScope.launch {
+            repeatOnLifecycle(Lifecycle.State.STARTED) {
+                // [CORREÇÃO 1] Agora coletamos um UiState bem definido
+                viewModel.uiState.collect { state ->
+                    when (state) {
+                        is EditorUiState.Idle -> hideLoading()
+                        is EditorUiState.Loading -> showLoading()
+                        is EditorUiState.Success -> {
+                            hideLoading()
+                            showOutput(state.output)
+                        }
+                        is EditorUiState.Error -> {
+                            hideLoading()
+                            showError(state.message)
+                        }
+                        is EditorUiState.FileSaved -> {
+                            hideLoading()
+                            Snackbar.make(binding.root, R.string.file_saved, Snackbar.LENGTH_SHORT).show()
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private fun setupListeners() {
+        binding.fabRun.setOnClickListener {
+            val code = binding.codeEditor.text.toString()
+            // [ALTERAÇÃO] Agora o ViewModel expõe um método claro
+            viewModel.compileCode(code)
+        }
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        menuInflater.inflate(R.menu.menu_editor, menu)
+        return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        return when (item.itemId) {
+            R.id.action_save -> {
+                saveCurrentFile()
+                true
+            }
+            R.id.action_settings -> {
+                showSettings()
+                true
+            }
+            else -> super.onOptionsItemSelected(item)
+        }
+    }
+
+    private fun saveCurrentFile() {
+        // [CORREÇÃO 3] Capturar o estado da UI na thread principal ANTES de lançar a corrotina
+        val content = binding.codeEditor.text.toString()
+        val cursorPos = binding.codeEditor.selectionEnd
+
+        lifecycleScope.launch {
+            viewModel.saveFile(content)
+        }
+    }
+
+    private fun showSettings() {
+        // TODO: Navegar para tela de configurações
+        Snackbar.make(binding.root, "Configurações (em desenvolvimento)", Snackbar.LENGTH_SHORT).show()
+    }
+
+    private fun showLoading() {
+        // [CORREÇÃO 5] Certifique-se de que o layout activity_main.xml tem uma ProgressBar com id progressBar
+        binding.progressBar.visibility = android.view.View.VISIBLE
+    }
+
+    private fun hideLoading() {
+        binding.progressBar.visibility = android.view.View.GONE
+    }
+
+    private fun showOutput(output: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.output)
+            .setMessage(output)
+            .setPositiveButton(R.string.ok, null)
+            .show()
+    }
+
+    private fun showError(message: String) {
+        MaterialAlertDialogBuilder(this)
+            .setTitle(R.string.error)
+            .setMessage(message)
+            .setPositiveButton(R.string.ok, null)
+            .show()
+    }
+
+    override fun onPause() {
+        super.onPause()
+        // [CORREÇÃO 3] Capturar estado na thread principal antes de salvar
+        val content = binding.codeEditor.text.toString()
+        val cursorPos = binding.codeEditor.selectionEnd
+
+        lifecycleScope.launch {
+            // [CORREÇÃO 2] Agora salvamos o tipo correto
+            editorCache.saveState(EditorPersistedState(content, cursorPos))
+        }
+    }
+}    @Inject
     lateinit var editorCache: SmartEditorCache
 
     override fun onCreate(savedInstanceState: Bundle?) {
